@@ -2,6 +2,18 @@ import './css/styles.css';
 
 import debounce from 'lodash.debounce';
 
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
+Notify.init({
+  width: '300px',
+  position: 'center-top',
+  distance: '10px',
+  borderRadius: '10px',
+  timeout: 1000,
+});
+
+import { fetchCountries } from './fetchCountries.js';
+
 const DEBOUNCE_DELAY = 300;
 
 const input = document.querySelector('#search-box');
@@ -10,73 +22,74 @@ const countryBox = document.querySelector('.country-info');
 
 input.addEventListener('input', debounce(onSearchInput, DEBOUNCE_DELAY));
 
-function fetchCountries(name) {
-  return fetch(
-    `https://restcountries.com/v3.1/name/${name}?fields=name,capital,population,flags,languages`
-  ).then(response => {
-    if (!response.ok) {
-      throw new Error(response.status);
-    }
-
-    return response.json();
-  });
-}
-
 function onSearchInput(event) {
   event.preventDefault();
   let nameSearchCountry = event.target.value.trim();
   if (nameSearchCountry === '') {
+    clearMarkup();
     return;
   }
   fetchCountries(nameSearchCountry)
     .then(data => {
-      if (data.length > 10) {
-        countryBox.innerHTML = '';
-        list.innerHTML = '';
-        console.log(
-          'Too many matches found. Please enter a more specific name.'
-        );
-        return;
-      }
-      if (data.length >= 2) {
-        countriesListCreate(data);
-        countryBox.innerHTML = '';
-      }
-      if (data.length === 1) {
-        countryCreate(data);
-        list.innerHTML = '';
-      }
+      createMarkup(data);
     })
     .catch(error => {
-      console.log('Oops, there is no country with that name');
+      clearMarkup();
+      Notify.failure('Oops, there is no country with that name');
     });
 }
 
-function countriesListCreate(data) {
+function createMarkup(data) {
+  if (data.length > 10) {
+    clearMarkup();
+    Notify.info('Too many matches found. Please enter a more specific name.');
+
+    return;
+  }
+  if (data.length >= 2) {
+    createCountriesList(data);
+    countryBox.innerHTML = '';
+  }
+  if (data.length === 1) {
+    createCountry(data);
+    list.innerHTML = '';
+  }
+}
+
+function createCountriesList(data) {
   const markup = data
     .map(
-      country => `<li>
+      country => `<li class = "coutry-item">
   <img src="${country.flags.svg}" alt="Coutry Flag" width="40" />
-  <p>${country.name.official}</p>
+  <p class = "coutry-name">${country.name.common}</p>
 </li>`
     )
     .join('');
   list.innerHTML = markup;
 }
 
-function countryCreate(data) {
+function createCountry(data) {
   const markup = data
     .map(
-      country => `<img src="${
+      country => `<div class="country-info-wraperr"><img src="${
         country.flags.svg
       }" alt="Coutry Flag" width="40" />
-  <p>${country.name.official}</p>
-  <p class="countri-data">Capital:<span>${country.capital}</span></p>
-  <p class="countri-data">Population:<span>${country.population}</span></p>
-  <p class="countri-data">Languages:<span>${Object.values(
+  <p class = "coutry-info-name">${country.name.common}</p></div>
+  <p class="country-info-data">Capital:<span class="country-info-item">${
+    country.capital
+  }</span></p>
+  <p class="country-info-data">Population:<span class="country-info-item">${
+    country.population
+  }</span></p>
+  <p class="country-info-data">Languages:<span class="country-info-item">${Object.values(
     country.languages
   )}</span></p>`
     )
     .join('');
   countryBox.innerHTML = markup;
+}
+
+function clearMarkup() {
+  countryBox.innerHTML = '';
+  list.innerHTML = '';
 }

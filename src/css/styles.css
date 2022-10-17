@@ -12,9 +12,59 @@ body {
   line-height: 1.5;
 }
 
+p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 #search-box {
   font: inherit;
   padding: 8px;
   max-width: 320px;
   margin-bottom: 16px;
+}
+
+.country-list {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 10px;
+}
+
+.coutry-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.coutry-name {
+  font-size: 24;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.country-info {
+  margin-left: 10px;
+}
+
+.country-info-wraperr {
+  display: flex;
+  align-items: center;
+}
+
+.coutry-info-name {
+  font-size: 36;
+  font-weight: 500;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.country-info-data {
+  font-size: 20;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.country-info-item {
+  font-weight: 400;
+  margin-left: 10px;
 }
